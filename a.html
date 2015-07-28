@@ -1,0 +1,54 @@
+ <!DOCTYPE HTML>
+<html>
+ <head>
+ <script type="text/javascript">
+ var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+ var msg;
+ db.transaction(function (tx) {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS LOGS (id unique, log)');
+    tx.executeSql('INSERT INTO LOGS (id, log) VALUES (1, "foobar")');
+    tx.executeSql('INSERT INTO LOGS (id, log) VALUES (2, "logmsg")');
+    msg = '<p>Log message created and row inserted.</p>';
+    document.querySelector('#status').innerHTML =   msg;
+ });
+ db.transaction(function (tx) {
+    tx.executeSql('SELECT * FROM LOGS', [], function (tx, results) {
+    var len = results.rows.length, i;
+     msg = "<p>Found rows: " + len + "</p>";
+     document.querySelector('#status').innerHTML +=   msg;
+    for (i = 0; i < len; i++){
+       msg = "<p><b>" + results.rows.item(i).log + "</b></p>";
+      document.querySelector('#status').innerHTML +=   msg;
+     }
+ }, null);
+ });
+/*	openDatabase：这个方法使用现有数据库或新建数据库来创建数据库对象
+	transaction：这个方法允许我们根据情况控制事务提交或回滚
+	executeSql：这个方法用于执行真实的 SQL 查询 */
+/*	清单 4. 查询结果集 API
+result：查询出来的数据集。其数据类型为 SQLResultSet ，就如同C#中的DataTable。 
+SQLResultSet 的定义为：
+
+interface SQLResultSet {
+readonly attribute long insertId;
+readonly attribute long rowsAffected;
+readonly attribute SQLResultSetRowList rows;
+};
+
+如果插入数据库一行数据，insertId 代表这个行号；如果插入多行数据，insertId 代表插入数据的最后一行行号。
+SQL 语句执行后改变的行数用 rowsAffected 表示，如果 SQL 语句没有改变任何行，则 rowsAffected 为 0，对于“SELECT”语句，rowsAffected 就为 0.
+rows 为一个 SQLResultSetRowList 对象，代表数据库按顺序返回的行。如果没有返回任何行，则这个对象为空。
+
+http://www.cnblogs.com/wshiqtb/archive/2013/04/07/3003698.html
+
+
+	})*/
+	
+	
+ </script>
+ </head>
+ <body>
+ <div id="status" name="status">Status Message</div>
+ <div id="status2" name="status">Status Message</div>
+ </body>
+</html>
